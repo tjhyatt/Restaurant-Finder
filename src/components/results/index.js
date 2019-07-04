@@ -7,6 +7,10 @@ class Results extends Component {
     this.props.index(event.target.attributes.data.value)
   }
 
+  onLoadMore = () => {
+    this.props.loadMore()
+  }
+
   render() { 
     return ( 
       <div className="results">
@@ -17,7 +21,7 @@ class Results extends Component {
             return <div className="result" data={index} key={index} onClick={this.onResultClick}>{restaurant.restaurant.name}</div>
           })}
 
-          <div className="result results-footer">Load more</div>
+          <div className="result results-footer" onClick={this.onLoadMore}>Load more</div>
         </div>
       </div>
     );

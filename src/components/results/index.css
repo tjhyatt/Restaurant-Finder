@@ -8,7 +8,7 @@
   -ms-flex-direction: column;
   flex-direction: column;
   width: 300px;
-  height: calc(100vh - 200px);
+  height: calc(100vh - 205px);
   overflow: auto;
 }
 
