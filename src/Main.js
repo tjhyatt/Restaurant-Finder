@@ -14,12 +14,13 @@ class Main extends Component {
       rating: [0, 5],
       cost: [1, 4],
       results: [],
-      resultsStartPoint: 0,
       resultsCurrentPoint: 0,
       resultsShown: 0,
       resultsShownTarget: 20,
-      resultsFound: 0,
       canResultsUpdate: false,
+      searchCycleCount: 0,
+      isSearching: false,
+      noMoreResults: false,
       selectedRestaurant: null
     }
   }
@@ -35,25 +36,28 @@ class Main extends Component {
   }
 
   restaurantSearch() {
-    const config = { headers: {'user-key': 'b7bd715c6a64fa152add1f296336b0fe '} }
+    const config = { headers: {'user-key': 'ccbcf9be3273c44c0b89e6d3bb100be0 '} }
     let apiString = this.getSearchString()
 
     // clear old results
     this.setState({ 
       results: [],
-      resultsStartPoint: 0,
+      resultsCurrentPoint: 0,
       resultsShown: 0,
+      resultsShownTarget: 20,
       canResultsUpdate: false,
-      selectedRestaurant: null
+      selectedRestaurant: null,
+      isSearching: true,
+      noMoreResults: false
     })
     
     axios.get(apiString, config).then(res => { 
 
-      this.setState({
-        resultsCurrentPoint: this.state.resultsCurrentPoint + res.data.results_shown
-      })
-
       res.data['restaurants'].forEach(restaurant => {
+
+        this.setState({
+          resultsCurrentPoint: res.data.results_shown
+        })
 
         // filter rating & cost
         const rating = restaurant.restaurant.user_rating.aggregate_rating
@@ -61,7 +65,6 @@ class Main extends Component {
 
         if (rating >= this.state.rating[0] && rating <= this.state.rating[1]) {
           if (cost >= this.state.cost[0] && cost <= this.state.cost[1]) {
-            console.log("adding", restaurant)
             this.setState({
               results: [...this.state.results, restaurant],
               resultsShown: this.state.resultsShown + 1,
@@ -73,7 +76,12 @@ class Main extends Component {
   }
 
   loadMoreResults() {
-    const config = { headers: {'user-key': 'b7bd715c6a64fa152add1f296336b0fe '} }
+    this.setState({ 
+      isSearching: true,
+      searchCycleCount: this.state.searchCycleCount + 1
+    })
+
+    const config = { headers: {'user-key': 'ccbcf9be3273c44c0b89e6d3bb100be0 '} }
     let apiString = this.getSearchString(this.state.resultsCurrentPoint)
 
     let totalResultsFound
@@ -81,11 +89,13 @@ class Main extends Component {
     axios.get(apiString, config).then(res => { 
 
       this.setState({
-        resultsCurrentPoint: this.state.resultsCurrentPoint + res.data.results_shown
+        resultsCurrentPoint: this.state.resultsCurrentPoint + 20
       })
 
       // get total results found
       totalResultsFound = res.data.results_found
+
+      console.log("searching " + this.state.resultsCurrentPoint + " of " + totalResultsFound)
 
       res.data['restaurants'].forEach(restaurant => {
 
@@ -95,7 +105,6 @@ class Main extends Component {
 
         if (rating >= this.state.rating[0] && rating <= this.state.rating[1]) {
           if (cost >= this.state.cost[0] && cost <= this.state.cost[1]) {
-            console.log("adding", restaurant)
             this.setState({
               results: [...this.state.results, restaurant],
               resultsShown: this.state.resultsShown + 1,
@@ -104,15 +113,26 @@ class Main extends Component {
         }
       })
     }).then(() => {
-      if (this.state.resultsShown < this.state.resultsShownTarget) {
+      if (this.state.resultsShown < this.state.resultsShownTarget && this.state.searchCycleCount < 5) {
         if (this.state.resultsCurrentPoint > totalResultsFound) {
-          // end on results
-          console.log("no more results")
+          // end of results
+          this.setState({ 
+            noMoreResults: true, 
+            isSearching: false,
+            canResultsUpdate: false
+          })
           return
         } else {
           // keep searching
           this.loadMoreResults()
         }
+      } else {
+        console.log("search complete")
+        this.setState({ 
+          isSearching: false, 
+          canResultsUpdate: false,
+          searchCycleCount: 0
+        })
       }
     })
   }

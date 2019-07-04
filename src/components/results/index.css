@@ -39,6 +39,10 @@
   padding: 12px 20px;
 }
 
-.result:hover {
+.result.selected {
   background: #b9b9b9;
+}
+
+.result:hover {
+  background: #a8a8a8;
 }
