@@ -24,6 +24,7 @@ class Filter extends Component {
   render() { 
     return ( 
       <div className="filter">
+        <div className={this.props.isSearching ? 'overlay active' : 'overlay'}></div>
         <div className="filter-list">
 
           <div className="list-headings">
@@ -111,7 +112,7 @@ class Filter extends Component {
         <div className="filter-sliders">
           <div className="slider-block">
             <div className="heading">Rating</div>
-            <Nouislider range={{ min: 0, max: 5 }} start={[0, 5]} step={1} connect onSlide={this.onRatingChange} />
+            <Nouislider range={{ min: 0, max: 5 }} start={[0, 5]} step={1} connect onEnd={this.onRatingChange} />
             <div className="markers">
               <div>0</div>
               <div>1</div>
@@ -123,7 +124,7 @@ class Filter extends Component {
           </div>
           <div className="slider-block">
             <div className="heading">Cost</div>
-            <Nouislider range={{ min: 1, max: 4 }} start={[1, 4]} step={1} connect onSlide={this.onCostChange} />
+            <Nouislider range={{ min: 1, max: 4 }} start={[1, 4]} step={1} connect onEnd={this.onCostChange} />
             <div className="markers">
               <div>$</div>
               <div>$$</div>
@@ -132,6 +133,7 @@ class Filter extends Component {
             </div>
           </div>
         </div>
+
       </div>
     );
   }

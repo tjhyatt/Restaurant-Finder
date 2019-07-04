@@ -72,7 +72,11 @@ class Main extends Component {
           }
         }
       })
-    }) 
+    }).then(() => {
+      this.setState({ 
+        isSearching: false
+      })
+    })
   }
 
   loadMoreResults() {
@@ -211,7 +215,8 @@ class Main extends Component {
           category={this.onFilterCatChange} 
           cuisine={this.onFilterCuisineChange} 
           rating={this.onRatingChange} 
-          cost={this.onCostChange} 
+          cost={this.onCostChange}
+          isSearching={this.state.isSearching}
         />
         <div className="display-wrapper">
           <Results 
